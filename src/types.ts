@@ -30,13 +30,41 @@ export interface Folder {
   setIds: string[];
 }
 
+export interface StudyClass {
+  id: string;
+  name: string;
+  schoolName: string;
+  joinCode: string;
+  memberCount: number;
+  setIds: string[];
+}
+
 export interface UserStats {
   setsStudiedCount: number;
   termsMasteredCount: number;
   streakDays: number;
   lastStudiedDate: string;
-  matchGameHighScores: Record<string, number>; // setid -> time in seconds
+  matchGameHighScores: Record<string, number>;
 }
+
+export const INITIAL_CLASSES: StudyClass[] = [
+  {
+    id: 'class-1',
+    name: 'AP Computer Science A - Fall 2026',
+    schoolName: 'Lincoln High School',
+    joinCode: 'QL-CS-892',
+    memberCount: 28,
+    setIds: ['set-cs-1']
+  },
+  {
+    id: 'class-2',
+    name: 'Spanish 101 Intensive',
+    schoolName: 'State University',
+    joinCode: 'QL-ESP-101',
+    memberCount: 15,
+    setIds: ['set-span-1']
+  }
+];
 
 export const INITIAL_SETS: StudySet[] = [
   {

@@ -10,7 +10,8 @@ import {
   BrainCircuit,
   LayoutGrid,
   Sun,
-  Moon
+  Moon,
+  BookCheck
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -74,6 +75,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <LayoutGrid className="w-4 h-4" />
               Dashboard
             </button>
+
             <button
               onClick={() => setActiveView('library')}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
@@ -85,6 +87,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               <BookOpen className="w-4 h-4" />
               Your Library
             </button>
+
+            <button
+              onClick={() => setActiveView('expert-solutions')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                activeView === 'expert-solutions'
+                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/80 dark:text-emerald-400'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+            >
+              <BookCheck className="w-4 h-4 text-emerald-500" />
+              Expert Solutions
+            </button>
+
             <button
               onClick={() => setActiveView('ai-assistant')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${

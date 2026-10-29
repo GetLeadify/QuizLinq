@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import type { StudySet, Folder, UserStats } from './types';
+import type { StudySet, Folder, UserStats, StudyClass } from './types';
 import { Navbar } from './components/Navbar';
 import { Dashboard } from './components/Dashboard';
 import { SetEditor } from './components/SetEditor';
 import { SetDetail } from './components/SetDetail';
 import { Library } from './components/Library';
 import { AIAssistant } from './components/AIAssistant';
+import { ExpertSolutions } from './components/ExpertSolutions';
 import {
   getStoredSets,
   saveStoredSets,
   getStoredFolders,
   saveStoredFolders,
+  getStoredClasses,
+  saveStoredClasses,
   getStoredStats,
   saveStoredStats
 } from './storage';
@@ -18,13 +21,13 @@ import {
 export function App() {
   const [sets, setSets] = useState<StudySet[]>(getStoredSets);
   const [folders, setFolders] = useState<Folder[]>(getStoredFolders);
+  const [classes, setClasses] = useState<StudyClass[]>(getStoredClasses);
   const [stats, setStats] = useState<UserStats>(getStoredStats);
 
   const [activeView, setActiveView] = useState<string>('dashboard');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
 
-  // Quizlet Feature: Dark Mode persistence
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     return localStorage.getItem('quizlinq_dark_mode') === 'true';
   });
@@ -83,6 +86,12 @@ export function App() {
     saveStoredFolders(updatedFolders);
   };
 
+  const handleDeleteClass = (classId: string) => {
+    const updatedClasses = classes.filter(c => c.id !== classId);
+    setClasses(updatedClasses);
+    saveStoredClasses(updatedClasses);
+  };
+
   const handleTermStarToggle = (termId: string) => {
     if (!selectedSet) return;
 
@@ -125,6 +134,25 @@ export function App() {
     }
   };
 
+  const handleOpenCreateClass = () => {
+    const className = prompt('Enter class or study group name:');
+    if (className && className.trim()) {
+      const schoolName = prompt('Enter school or university name (optional):') || 'QuizLinq Community';
+      const newClass: StudyClass = {
+        id: 'class-' + Date.now(),
+        name: className.trim(),
+        schoolName: schoolName.trim(),
+        joinCode: 'QL-' + Math.floor(100 + Math.random() * 900),
+        memberCount: 1,
+        setIds: sets.length > 0 ? [sets[0].id] : []
+      };
+      const updatedClasses = [...classes, newClass];
+      setClasses(updatedClasses);
+      saveStoredClasses(updatedClasses);
+      alert(`Class "${className}" created! Join Code: ${newClass.joinCode}`);
+    }
+  };
+
   return (
     <div className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${darkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
       <Navbar
@@ -158,12 +186,19 @@ export function App() {
           <Library
             sets={sets}
             folders={folders}
+            classes={classes}
             onSelectSet={handleSelectSet}
             onOpenCreateSet={handleOpenCreateSet}
             onOpenCreateFolder={handleOpenCreateFolder}
+            onOpenCreateClass={handleOpenCreateClass}
             onDeleteFolder={handleDeleteFolder}
             onDeleteSet={handleDeleteSet}
+            onDeleteClass={handleDeleteClass}
           />
+        )}
+
+        {activeView === 'expert-solutions' && (
+          <ExpertSolutions />
         )}
 
         {activeView === 'ai-assistant' && (

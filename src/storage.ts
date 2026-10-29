@@ -1,8 +1,9 @@
-import type { StudySet, Folder, UserStats } from './types';
-import { INITIAL_SETS, INITIAL_FOLDERS } from './types';
+import type { StudySet, Folder, UserStats, StudyClass } from './types';
+import { INITIAL_SETS, INITIAL_FOLDERS, INITIAL_CLASSES } from './types';
 
 const SETS_KEY = 'quizlinq_sets_v1';
 const FOLDERS_KEY = 'quizlinq_folders_v1';
+const CLASSES_KEY = 'quizlinq_classes_v1';
 const STATS_KEY = 'quizlinq_stats_v1';
 
 export function getStoredSets(): StudySet[] {
@@ -44,6 +45,27 @@ export function saveStoredFolders(folders: Folder[]): void {
     localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
   } catch (err) {
     console.error('Failed to save folders to localStorage', err);
+  }
+}
+
+export function getStoredClasses(): StudyClass[] {
+  try {
+    const data = localStorage.getItem(CLASSES_KEY);
+    if (!data) {
+      localStorage.setItem(CLASSES_KEY, JSON.stringify(INITIAL_CLASSES));
+      return INITIAL_CLASSES;
+    }
+    return JSON.parse(data);
+  } catch {
+    return INITIAL_CLASSES;
+  }
+}
+
+export function saveStoredClasses(classes: StudyClass[]): void {
+  try {
+    localStorage.setItem(CLASSES_KEY, JSON.stringify(classes));
+  } catch (err) {
+    console.error('Failed to save classes to localStorage', err);
   }
 }
 
