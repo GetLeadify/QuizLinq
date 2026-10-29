@@ -5,6 +5,8 @@ import { LearnMode } from './LearnMode';
 import { TestMode } from './TestMode';
 import { MatchMode } from './MatchMode';
 import { GravityMode } from './GravityMode';
+import { DiagramMode } from './DiagramMode';
+import { SpellingMode } from './SpellingMode';
 import {
   BookOpen,
   BrainCircuit,
@@ -16,7 +18,9 @@ import {
   Edit3,
   Share2,
   Printer,
-  Volume2
+  Volume2,
+  Target,
+  Mic
 } from 'lucide-react';
 
 interface SetDetailProps {
@@ -35,7 +39,7 @@ export const SetDetail: React.FC<SetDetailProps> = ({
   onTermStarToggle,
   onStatsUpdate
 }) => {
-  const [activeMode, setActiveMode] = useState<'flashcards' | 'learn' | 'test' | 'match' | 'gravity'>('flashcards');
+  const [activeMode, setActiveMode] = useState<'flashcards' | 'learn' | 'test' | 'match' | 'gravity' | 'diagram' | 'spelling'>('flashcards');
 
   const handleTextToSpeech = (text: string) => {
     if ('speechSynthesis' in window) {
@@ -132,90 +136,89 @@ export const SetDetail: React.FC<SetDetailProps> = ({
       </div>
 
       {/* Mode Selector Tabs */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
         <button
           onClick={() => setActiveMode('flashcards')}
-          className={`p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 ${
+          className={`p-3 rounded-2xl border text-left transition-all flex items-center gap-2.5 ${
             activeMode === 'flashcards'
-              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none'
-              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 shadow-2xs'
+              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
+              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
           }`}
         >
-          <div className={`p-2 rounded-xl ${activeMode === 'flashcards' ? 'bg-indigo-500/50 text-white' : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400'}`}>
-            <BookOpen className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="font-bold text-xs sm:text-sm">Flashcards</div>
-            <div className={`text-[11px] ${activeMode === 'flashcards' ? 'text-indigo-100' : 'text-slate-400'}`}>Flip & Learn</div>
-          </div>
+          <BookOpen className="w-4 h-4 shrink-0" />
+          <span className="font-bold text-xs truncate">Flashcards</span>
         </button>
 
         <button
           onClick={() => setActiveMode('learn')}
-          className={`p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 ${
+          className={`p-3 rounded-2xl border text-left transition-all flex items-center gap-2.5 ${
             activeMode === 'learn'
-              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none'
-              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 shadow-2xs'
+              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
+              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
           }`}
         >
-          <div className={`p-2 rounded-xl ${activeMode === 'learn' ? 'bg-indigo-500/50 text-white' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'}`}>
-            <BrainCircuit className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="font-bold text-xs sm:text-sm">Learn</div>
-            <div className={`text-[11px] ${activeMode === 'learn' ? 'text-indigo-100' : 'text-slate-400'}`}>Adaptive Recall</div>
-          </div>
+          <BrainCircuit className="w-4 h-4 shrink-0" />
+          <span className="font-bold text-xs truncate">Learn</span>
         </button>
 
         <button
           onClick={() => setActiveMode('test')}
-          className={`p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 ${
+          className={`p-3 rounded-2xl border text-left transition-all flex items-center gap-2.5 ${
             activeMode === 'test'
-              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none'
-              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 shadow-2xs'
+              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
+              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
           }`}
         >
-          <div className={`p-2 rounded-xl ${activeMode === 'test' ? 'bg-indigo-500/50 text-white' : 'bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400'}`}>
-            <FileCheck2 className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="font-bold text-xs sm:text-sm">Test</div>
-            <div className={`text-[11px] ${activeMode === 'test' ? 'text-indigo-100' : 'text-slate-400'}`}>Practice Quiz</div>
-          </div>
+          <FileCheck2 className="w-4 h-4 shrink-0" />
+          <span className="font-bold text-xs truncate">Test</span>
         </button>
 
         <button
           onClick={() => setActiveMode('match')}
-          className={`p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 ${
+          className={`p-3 rounded-2xl border text-left transition-all flex items-center gap-2.5 ${
             activeMode === 'match'
-              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none'
-              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 shadow-2xs'
+              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
+              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
           }`}
         >
-          <div className={`p-2 rounded-xl ${activeMode === 'match' ? 'bg-indigo-500/50 text-white' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'}`}>
-            <Zap className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="font-bold text-xs sm:text-sm">Match</div>
-            <div className={`text-[11px] ${activeMode === 'match' ? 'text-indigo-100' : 'text-slate-400'}`}>Timed Grid</div>
-          </div>
+          <Zap className="w-4 h-4 shrink-0" />
+          <span className="font-bold text-xs truncate">Match</span>
         </button>
 
         <button
           onClick={() => setActiveMode('gravity')}
-          className={`p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 ${
+          className={`p-3 rounded-2xl border text-left transition-all flex items-center gap-2.5 ${
             activeMode === 'gravity'
-              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none'
-              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 shadow-2xs'
+              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
+              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
           }`}
         >
-          <div className={`p-2 rounded-xl ${activeMode === 'gravity' ? 'bg-indigo-500/50 text-white' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'}`}>
-            <Flame className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="font-bold text-xs sm:text-sm">Gravity</div>
-            <div className={`text-[11px] ${activeMode === 'gravity' ? 'text-indigo-100' : 'text-slate-400'}`}>Arcade Speed</div>
-          </div>
+          <Flame className="w-4 h-4 shrink-0" />
+          <span className="font-bold text-xs truncate">Gravity</span>
+        </button>
+
+        <button
+          onClick={() => setActiveMode('diagram')}
+          className={`p-3 rounded-2xl border text-left transition-all flex items-center gap-2.5 ${
+            activeMode === 'diagram'
+              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
+              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
+          }`}
+        >
+          <Target className="w-4 h-4 shrink-0" />
+          <span className="font-bold text-xs truncate">Diagram</span>
+        </button>
+
+        <button
+          onClick={() => setActiveMode('spelling')}
+          className={`p-3 rounded-2xl border text-left transition-all flex items-center gap-2.5 ${
+            activeMode === 'spelling'
+              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md'
+              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200'
+          }`}
+        >
+          <Mic className="w-4 h-4 shrink-0" />
+          <span className="font-bold text-xs truncate">Spelling</span>
         </button>
       </div>
 
@@ -235,6 +238,12 @@ export const SetDetail: React.FC<SetDetailProps> = ({
         )}
         {activeMode === 'gravity' && (
           <GravityMode set={set} onHighScoreUpdate={() => onStatsUpdate(3)} />
+        )}
+        {activeMode === 'diagram' && (
+          <DiagramMode set={set} />
+        )}
+        {activeMode === 'spelling' && (
+          <SpellingMode set={set} />
         )}
       </div>
 
