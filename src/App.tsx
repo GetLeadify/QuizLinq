@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { StudySet, Folder, UserStats } from './types';
 import { Navbar } from './components/Navbar';
 import { Dashboard } from './components/Dashboard';
@@ -23,6 +23,20 @@ export function App() {
   const [activeView, setActiveView] = useState<string>('dashboard');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
+
+  // Quizlet Feature: Dark Mode persistence
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    return localStorage.getItem('quizlinq_dark_mode') === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('quizlinq_dark_mode', String(darkMode));
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   const handleSelectSet = (set: StudySet) => {
     setSelectedSet(set);
@@ -112,7 +126,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${darkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
       <Navbar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -121,6 +135,8 @@ export function App() {
         onOpenCreateSet={handleOpenCreateSet}
         onOpenCreateFolder={handleOpenCreateFolder}
         stats={stats}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">

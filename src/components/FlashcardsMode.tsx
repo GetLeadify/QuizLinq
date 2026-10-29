@@ -6,7 +6,9 @@ import {
   Shuffle,
   Star,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ArrowLeftRight,
+  Gauge
 } from 'lucide-react';
 
 interface FlashcardsModeProps {
@@ -20,6 +22,12 @@ export const FlashcardsMode: React.FC<FlashcardsModeProps> = ({ set, onTermStarT
   const [isFlipped, setIsFlipped] = useState(false);
   const [isShuffled, setIsShuffled] = useState(false);
   const [filterStarred, setFilterStarred] = useState(false);
+
+  // Quizlet Feature: Answer with Term or Definition first
+  const [startWithDefinition, setStartWithDefinition] = useState(false);
+
+  // Quizlet Feature: Audio Speech Rate (1.0x or 0.7x slow)
+  const [slowAudio, setSlowAudio] = useState(false);
 
   useEffect(() => {
     let activeTerms = set.terms;
@@ -63,7 +71,7 @@ export const FlashcardsMode: React.FC<FlashcardsModeProps> = ({ set, onTermStarT
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.95;
+      utterance.rate = slowAudio ? 0.65 : 0.95;
       window.speechSynthesis.speak(utterance);
     }
   };
@@ -88,16 +96,22 @@ export const FlashcardsMode: React.FC<FlashcardsModeProps> = ({ set, onTermStarT
     return <div className="text-center py-10 text-slate-500">No flashcards available.</div>;
   }
 
+  // Front vs Back content based on orientation preference
+  const frontContent = startWithDefinition ? currentTerm.definition : currentTerm.term;
+  const backContent = startWithDefinition ? currentTerm.term : currentTerm.definition;
+  const frontLabel = startWithDefinition ? 'Definition' : 'Term';
+  const backLabel = startWithDefinition ? 'Term' : 'Definition';
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
 
       {/* Controls Bar */}
-      <div className="flex items-center justify-between text-xs font-semibold text-slate-600 bg-white p-3 rounded-2xl border border-slate-200/80 shadow-2xs">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-slate-600 bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-2xs">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handleShuffle}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-colors ${
-              isShuffled ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-slate-100 text-slate-700'
+              isShuffled ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300' : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
             }`}
           >
             <Shuffle className="w-3.5 h-3.5" />
@@ -107,16 +121,36 @@ export const FlashcardsMode: React.FC<FlashcardsModeProps> = ({ set, onTermStarT
           <button
             onClick={() => setFilterStarred(!filterStarred)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-colors ${
-              filterStarred ? 'bg-amber-100 text-amber-800' : 'hover:bg-slate-100 text-slate-700'
+              filterStarred ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300' : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
             }`}
           >
             <Star className={`w-3.5 h-3.5 ${filterStarred ? 'fill-amber-500 text-amber-500' : ''}`} />
-            Starred Only ({set.terms.filter(t => t.starred).length})
+            Starred ({set.terms.filter(t => t.starred).length})
+          </button>
+
+          <button
+            onClick={() => setStartWithDefinition(!startWithDefinition)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+            title="Switch front/back orientation"
+          >
+            <ArrowLeftRight className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <span>Show {startWithDefinition ? 'Definition First' : 'Term First'}</span>
+          </button>
+
+          <button
+            onClick={() => setSlowAudio(!slowAudio)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-colors ${
+              slowAudio ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300' : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+            }`}
+            title="Toggle Audio Speed"
+          >
+            <Gauge className="w-3.5 h-3.5" />
+            <span>{slowAudio ? 'Audio: 0.7x (Slow)' : 'Audio: 1.0x'}</span>
           </button>
         </div>
 
-        <div className="text-slate-400 font-medium hidden sm:block">
-          Press <kbd className="px-1.5 py-0.5 bg-slate-100 border rounded text-[10px]">Space</kbd> to flip, <kbd className="px-1.5 py-0.5 bg-slate-100 border rounded text-[10px]">← / →</kbd> to navigate
+        <div className="text-slate-400 dark:text-slate-500 font-medium hidden md:block">
+          <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 border rounded text-[10px]">Space</kbd> flip
         </div>
       </div>
 
@@ -130,16 +164,16 @@ export const FlashcardsMode: React.FC<FlashcardsModeProps> = ({ set, onTermStarT
             isFlipped ? 'rotate-y-180' : ''
           }`}
         >
-          {/* Front Side (Term) */}
-          <div className="absolute inset-0 w-full h-full bg-white border border-slate-200/90 rounded-3xl p-8 sm:p-12 shadow-md flex flex-col justify-between backface-hidden group-hover:border-indigo-300 transition-colors">
+          {/* Front Side */}
+          <div className="absolute inset-0 w-full h-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 rounded-3xl p-8 sm:p-12 shadow-md flex flex-col justify-between backface-hidden group-hover:border-indigo-300 transition-colors">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
-                Term
+              <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full">
+                {frontLabel}
               </span>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={(e) => handleTextToSpeech(e, currentTerm.term)}
-                  className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-full transition-colors"
+                  onClick={(e) => handleTextToSpeech(e, frontContent)}
+                  className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors"
                   title="Listen"
                 >
                   <Volume2 className="w-5 h-5" />
@@ -149,7 +183,7 @@ export const FlashcardsMode: React.FC<FlashcardsModeProps> = ({ set, onTermStarT
                     e.stopPropagation();
                     onTermStarToggle(currentTerm.id);
                   }}
-                  className="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-full transition-colors"
+                  className="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-full transition-colors"
                   title="Star Term"
                 >
                   <Star className={`w-5 h-5 ${currentTerm.starred ? 'fill-amber-400 text-amber-400' : ''}`} />
@@ -158,26 +192,26 @@ export const FlashcardsMode: React.FC<FlashcardsModeProps> = ({ set, onTermStarT
             </div>
 
             <div className="my-auto text-center px-4">
-              <p className="text-2xl sm:text-4xl font-extrabold text-slate-900 leading-snug">
-                {currentTerm.term}
+              <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white leading-relaxed">
+                {frontContent}
               </p>
             </div>
 
-            <div className="text-center text-xs font-semibold text-slate-400 flex items-center justify-center gap-1">
+            <div className="text-center text-xs font-semibold text-slate-400 dark:text-slate-500 flex items-center justify-center gap-1">
               <RotateCw className="w-3.5 h-3.5" />
-              Click or press Space to reveal definition
+              Click or press Space to flip
             </div>
           </div>
 
-          {/* Back Side (Definition) */}
-          <div className="absolute inset-0 w-full h-full bg-indigo-900 text-white border border-indigo-800 rounded-3xl p-8 sm:p-12 shadow-md flex flex-col justify-between backface-hidden rotate-y-180">
+          {/* Back Side */}
+          <div className="absolute inset-0 w-full h-full bg-indigo-900 dark:bg-indigo-950 text-white border border-indigo-800 dark:border-indigo-900 rounded-3xl p-8 sm:p-12 shadow-md flex flex-col justify-between backface-hidden rotate-y-180">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-200 bg-indigo-800/80 px-3 py-1 rounded-full">
-                Definition
+              <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-200 bg-indigo-800/80 dark:bg-indigo-900/80 px-3 py-1 rounded-full">
+                {backLabel}
               </span>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={(e) => handleTextToSpeech(e, currentTerm.definition)}
+                  onClick={(e) => handleTextToSpeech(e, backContent)}
                   className="p-2 text-indigo-300 hover:text-white hover:bg-indigo-800/60 rounded-full transition-colors"
                   title="Listen"
                 >
@@ -197,8 +231,8 @@ export const FlashcardsMode: React.FC<FlashcardsModeProps> = ({ set, onTermStarT
             </div>
 
             <div className="my-auto text-center px-4">
-              <p className="text-xl sm:text-3xl font-medium text-indigo-50 leading-relaxed">
-                {currentTerm.definition}
+              <p className="text-xl sm:text-2xl font-medium text-indigo-50 leading-relaxed">
+                {backContent}
               </p>
             </div>
 
@@ -214,19 +248,19 @@ export const FlashcardsMode: React.FC<FlashcardsModeProps> = ({ set, onTermStarT
       <div className="flex items-center justify-between pt-2">
         <button
           onClick={handlePrev}
-          className="p-3 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-2xl transition-all shadow-xs"
+          className="p-3 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl transition-all shadow-xs"
           title="Previous Card"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
 
-        <span className="text-sm font-bold text-slate-600">
+        <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
           {currentIndex + 1} / {terms.length}
         </span>
 
         <button
           onClick={handleNext}
-          className="p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl transition-all shadow-md shadow-indigo-200"
+          className="p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl transition-all shadow-md shadow-indigo-200 dark:shadow-none"
           title="Next Card"
         >
           <ChevronRight className="w-6 h-6" />

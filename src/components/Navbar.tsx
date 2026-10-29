@@ -8,7 +8,9 @@ import {
   BookOpen,
   Flame,
   BrainCircuit,
-  LayoutGrid
+  LayoutGrid,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -19,6 +21,8 @@ interface NavbarProps {
   onOpenCreateSet: () => void;
   onOpenCreateFolder: () => void;
   stats: UserStats;
+  darkMode: boolean;
+  setDarkMode: (val: boolean) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -28,12 +32,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveView,
   onOpenCreateSet,
   onOpenCreateFolder,
-  stats
+  stats,
+  darkMode,
+  setDarkMode
 }) => {
   const [showCreateMenu, setShowCreateMenu] = React.useState(false);
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-xs">
+    <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-xs transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
 
         {/* Brand Logo */}
@@ -42,14 +48,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveView('dashboard')}
             className="flex items-center gap-2 group text-left focus:outline-none"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-sky-400 flex items-center justify-center text-white shadow-md shadow-indigo-200 group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-sky-400 flex items-center justify-center text-white shadow-md shadow-indigo-200 dark:shadow-none group-hover:scale-105 transition-transform">
               <BrainCircuit className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-xl font-black bg-gradient-to-r from-indigo-600 to-sky-600 bg-clip-text text-transparent">
+              <span className="text-xl font-black bg-gradient-to-r from-indigo-600 to-sky-500 dark:from-indigo-400 dark:to-sky-400 bg-clip-text text-transparent">
                 QuizLinq
               </span>
-              <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase -mt-1">
+              <span className="block text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase -mt-1">
                 Study Smart
               </span>
             </div>
@@ -61,8 +67,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setActiveView('dashboard')}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                 activeView === 'dashboard'
-                  ? 'bg-indigo-50 text-indigo-600'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               <LayoutGrid className="w-4 h-4" />
@@ -72,8 +78,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setActiveView('library')}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                 activeView === 'library'
-                  ? 'bg-indigo-50 text-indigo-600'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               <BookOpen className="w-4 h-4" />
@@ -83,8 +89,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setActiveView('ai-assistant')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                 activeView === 'ai-assistant'
-                  ? 'bg-indigo-50 text-indigo-600'
-                  : 'text-amber-700 bg-amber-50 hover:bg-amber-100'
+                  ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400'
+                  : 'text-amber-700 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-300 hover:bg-amber-100'
               }`}
             >
               <Sparkles className="w-4 h-4 text-amber-500 fill-amber-400" />
@@ -102,16 +108,25 @@ export const Navbar: React.FC<NavbarProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search terms, subjects, or sets..."
-              className="w-full pl-9 pr-4 py-2 bg-slate-100 hover:bg-slate-200/70 focus:bg-white text-sm text-slate-900 rounded-xl border border-transparent focus:border-indigo-500 focus:outline-none transition-all shadow-inner"
+              className="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/70 focus:bg-white dark:focus:bg-slate-900 text-sm text-slate-900 dark:text-white rounded-xl border border-transparent focus:border-indigo-500 focus:outline-none transition-all shadow-inner"
             />
           </div>
         </div>
 
         {/* Right Section / Actions & Stats */}
         <div className="flex items-center gap-3">
+          {/* Dark Mode Toggle */}
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+            title="Toggle Dark Mode"
+          >
+            {darkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
+          </button>
+
           {/* Daily Streak Indicator */}
           <div
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-full text-xs font-bold shadow-xs cursor-default"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 rounded-full text-xs font-bold shadow-xs cursor-default"
             title={`${stats.streakDays} day streak! Keep practicing daily.`}
           >
             <Flame className="w-4 h-4 text-amber-500 fill-amber-500 animate-pulse" />
@@ -122,7 +137,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="relative">
             <button
               onClick={() => setShowCreateMenu(!showCreateMenu)}
-              className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-sm px-4 py-2 rounded-xl transition-all shadow-sm shadow-indigo-200"
+              className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-sm px-4 py-2 rounded-xl transition-all shadow-sm shadow-indigo-200 dark:shadow-none"
             >
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">Create</span>
@@ -134,13 +149,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className="fixed inset-0 z-10"
                   onClick={() => setShowCreateMenu(false)}
                 />
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 z-20 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 py-1.5 z-20 animate-in fade-in slide-in-from-top-2 duration-150">
                   <button
                     onClick={() => {
                       setShowCreateMenu(false);
                       onOpenCreateSet();
                     }}
-                    className="w-full text-left px-4 py-2 text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2"
+                    className="w-full text-left px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-700 hover:text-indigo-600 flex items-center gap-2"
                   >
                     <Plus className="w-4 h-4 text-indigo-500" />
                     Study Set
@@ -150,7 +165,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       setShowCreateMenu(false);
                       onOpenCreateFolder();
                     }}
-                    className="w-full text-left px-4 py-2 text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2"
+                    className="w-full text-left px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-slate-700 hover:text-indigo-600 flex items-center gap-2"
                   >
                     <FolderPlus className="w-4 h-4 text-emerald-500" />
                     Folder
